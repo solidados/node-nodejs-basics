@@ -24,7 +24,7 @@ const copy = async () => {
       throw new Error(TASK_DATA.errors.isExist.message);
     } catch (error) {
       if (error.code !== TASK_DATA.errors.noExist.code) {
-        throw error;
+        handleError(error, TASK_DATA.errors.noExist);
       }
     }
 
