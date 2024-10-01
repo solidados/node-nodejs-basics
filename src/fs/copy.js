@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { cp, access, readdir } from "node:fs/promises";
+import { cp, access } from "node:fs/promises";
 import { getDirName } from "../helpers/getDirName.js";
 import handleError from "../helpers/handleError.js";
 
