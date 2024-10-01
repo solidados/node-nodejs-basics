@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { cp, access } from "node:fs/promises";
+import { cp, access, readdir } from "node:fs/promises";
 import { getDirName } from "../helpers/getDirName.js";
 import handleError from "../helpers/handleError.js";
 
@@ -10,6 +10,11 @@ const copy = async () => {
     errors: {
       isExist: { code: "EEXIST", message: "FS operation failed" },
       noExist: { code: "ENOENT", message: "FS operation failed" },
+    },
+    copyOptions: {
+      recursive: true,
+      errorOnExist: true,
+      force: false,
     },
   };
 
@@ -28,7 +33,7 @@ const copy = async () => {
       }
     }
 
-    await cp(sourcePath, destinationPath, { recursive: true });
+    await cp(sourcePath, destinationPath, TASK_DATA.copyOptions);
     console.log(
       `>> Success!\nFolder \x1b[34m${TASK_DATA.source.dirName}\x1b[0m now has its own clone \x1b[34m${TASK_DATA.destination.dirName}\x1b[0m`,
     );
