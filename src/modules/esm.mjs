@@ -1,5 +1,4 @@
 import {join, sep} from 'node:path';
-// import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { release, version } from 'node:os'
 import { createServer as createServerHttp } from 'node:http';
