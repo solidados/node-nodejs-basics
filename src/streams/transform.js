@@ -14,11 +14,15 @@ const transform = async () => {
     },
   });
 
-  pipeline(process.stdin, reverseTransform, process.stdout, (error) => {
-    if (error) {
-      handleError(error, "Text transformation error occurred.");
-    }
-  });
+  try {
+    await pipeline(process.stdin, reverseTransform, process.stdout, (error) => {
+      if (error) {
+        handleError(error, "Text transformation error occurred.");
+      }
+    });
+  } catch (error) {
+    handleError(error, "Error occurred during application process.");
+  }
 
   process.on("SIGINT", () => {
     console.log("\n\x1b[31mProcess interrupted by user\x1b[0m");
