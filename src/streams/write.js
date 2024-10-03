@@ -13,10 +13,14 @@ const write = async () => {
       noExist: { code: "ENOENT", message: "FS operation failed" },
     },
     options: { flags: "a+", encoding: "utf-8" },
+    lineInterface: {
+      input: process.stdin,
+      output: process.stdout,
+      prompt: "> ",
+    },
   };
 
-  const { destination, errors, options } = TASK_DATA;
-
+  const { destination, errors, options, lineInterface } = TASK_DATA;
   const __dirname = getDirName(import.meta.url);
   const pathToFile = join(__dirname, destination.dirName, destination.fileName);
   const fileNameWithExt = basename(pathToFile);
@@ -29,44 +33,37 @@ const write = async () => {
   }
 
   const writeStream = createWriteStream(pathToFile, options);
+  const rl = readline.createInterface(Object.assign(lineInterface));
 
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    prompt: "> ",
-  });
+  let isClosed = false;
 
   rl.prompt();
-
   console.log(
     "Start typing.\nType \x1b[7m.exit\x1b[0m or Press \x1b[7mCTRL+D\x1b[0m to complete: ",
   );
 
-  rl.on("line", async (line) => {
-    if (line.trim() === ".exit") {
-      writeStream.end();
-      rl.close();
-      return;
-    }
-    try {
-      writeStream.write(`${line}\n`);
-    } catch (error) {
-      handleError(error, errors.noExist);
-    }
-    rl.prompt();
-  });
-
-  rl.on("close", () => {
+  const handleClose = async () => {
+    if (isClosed) return;
+    isClosed = true;
     console.log(
       `\n\x1b[32mWrite to file\x1b[0m \x1b[34m${fileNameWithExt}\x1b[0m \x1b[32mcompleted successfully.\x1b[0m`,
     );
     writeStream.end();
+    rl.close();
+  };
+
+  rl.on("line", async (line) => {
+    if (line.trim() === ".exit") {
+      await handleClose();
+      return;
+    }
+    writeStream.write(`${line}\n`);
+    rl.prompt();
   });
 
-  process.on("SIGINT", () => {
-    writeStream.end();
-    rl.close();
-  });
+  rl.on("close", handleClose);
+
+  process.on("SIGINT", handleClose);
 };
 
 await write().catch((error) => {
