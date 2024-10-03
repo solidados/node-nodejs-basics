@@ -1,6 +1,7 @@
 import { access } from "node:fs/promises";
 import { basename, join } from "node:path";
 import { createWriteStream } from "node:fs";
+import process from "node:process";
 import * as readline from "node:readline";
 
 import { getDirName } from "../helpers/getDirName.js";
@@ -27,7 +28,7 @@ const write = async () => {
 
   try {
     await access(pathToFile);
-  } catch (error) {
+  } catch (_error) {
     handleError({ code: "ENOENT" }, errors.noExist);
     return;
   }
@@ -48,8 +49,8 @@ const write = async () => {
     console.log(
       `\n\x1b[32mWrite to file\x1b[0m \x1b[34m${fileNameWithExt}\x1b[0m \x1b[32mcompleted successfully.\x1b[0m`,
     );
-    writeStream.end();
-    rl.close();
+    await writeStream.end();
+    await rl.close();
   };
 
   rl.on("line", async (line) => {
@@ -58,7 +59,7 @@ const write = async () => {
       return;
     }
     writeStream.write(`${line}\n`);
-    rl.prompt();
+    await rl.prompt();
   });
 
   rl.on("close", handleClose);

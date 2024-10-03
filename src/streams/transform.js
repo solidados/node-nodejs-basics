@@ -1,4 +1,5 @@
 import { Transform, pipeline } from "node:stream";
+import process from "node:process";
 import { EOL } from "node:os";
 import handleError from "../helpers/handleError.js";
 
@@ -8,7 +9,7 @@ const transform = async () => {
   );
 
   const reverseTransform = new Transform({
-    transform(chunk, encoding, callback) {
+    transform(chunk, _, callback) {
       const reversedData = [...`${chunk}`.trim()].reverse().join("");
       callback(null, `\x1b[32m${reversedData}\x1b[0m${EOL}`);
     },
