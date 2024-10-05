@@ -1,19 +1,20 @@
 import { unlink as deleteFile } from "fs/promises";
 import { basename, join } from "node:path";
+import process from "node:process";
 import { getDirName } from "../helpers/getDirName.js";
 import handleError from "../helpers/handleError.js";
-import pathExists from "../helpers/pathExists.js";
+import isPathExists from "../helpers/isPathExists.js";
 
 const remove = async () => {
   const TASK_DATA = {
     destination: { dirName: "files", fileName: "fileToRemove.txt" },
     errors: {
       noExist: { code: "ENOENT", message: "FS operation failed" },
+      unknownError: { code: "UNKNOWN", message: "Unknown error occurred" },
     },
   };
 
   const { destination, errors } = TASK_DATA;
-
   const __dirname = getDirName(import.meta.url);
   const destinationPath = join(
     __dirname,
@@ -23,7 +24,7 @@ const remove = async () => {
   const dstFileNameWithExt = basename(destinationPath);
 
   try {
-    const destinationExist = await pathExists(destinationPath);
+    const destinationExist = await isPathExists(destinationPath);
     !destinationExist &&
       handleError(new Error(errors.noExist.message), errors.noExist);
 
@@ -32,11 +33,10 @@ const remove = async () => {
       `>> Success!\nFile \x1b[36m${dstFileNameWithExt}\x1b[0m was removed`,
     );
   } catch (error) {
-    if (error.message === errors.noExist.message) {
-      handleError(error, errors.noExist);
-    } else {
-      handleError(error, { code: "UNKNOWN", message: "FS operation failed" });
-    }
+    handleError(
+      error,
+      error.code === errors.noExist.code ? errors.noExist : errors.unknownError,
+    );
   }
 };
 

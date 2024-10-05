@@ -1,5 +1,6 @@
 import { join, basename } from "node:path";
 import { writeFile } from "node:fs/promises";
+import process from "node:process";
 import { getDirName } from "../helpers/getDirName.js";
 import handleError from "../helpers/handleError.js";
 
@@ -18,7 +19,6 @@ const create = async () => {
   };
 
   const { folderName, fileName, content, errors, options } = TASK_DATA;
-
   const __dirname = getDirName(import.meta.url);
   const pathToFile = join(__dirname, folderName, fileName);
   const fileNameWithExt = basename(pathToFile);
