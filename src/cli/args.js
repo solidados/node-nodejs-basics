@@ -1,3 +1,5 @@
+import process from "node:process";
+
 const parseArgs = () => {
   const argsArr = process.argv.slice(2);
 

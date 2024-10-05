@@ -1,3 +1,5 @@
+import process from "node:process";
+
 const parseEnv = () => {
   const prefix = "RSS_";
   const envVariables = Object.keys(process.env)
