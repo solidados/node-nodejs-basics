@@ -4,6 +4,7 @@ import { access } from "node:fs/promises";
 import { basename, join } from "node:path";
 import { pipeline } from "node:stream/promises";
 import { createGzip } from "node:zlib";
+import process from "node:process";
 
 import { getDirName } from "../helpers/getDirName.js";
 import handleError from "../helpers/handleError.js";
@@ -13,7 +14,7 @@ const compress = async () => {
     source: { dirName: "files", fileName: "fileToCompress.txt" },
     destination: { dirname: "files", fileName: "archive.gz" },
     errors: {
-      noExist: { code: "ENOENT", message: "Source file does not exist" },
+      noExist: { code: "ENOENT", message: "Path to file does not exist" },
     },
   };
 
@@ -39,11 +40,12 @@ const compress = async () => {
       `\x1b[32mFile\x1b[0m \x1b[34m${fileNameWithExt}\x1b[0m \x1b[32mcompressed successfully.\x1b[0m`,
     );
   } catch (error) {
-    if (error.code === "ENOENT") {
-      handleError(error, errors.noExist);
-    } else {
-      handleError(error, "An error occurred during compression.");
-    }
+    handleError(
+      error,
+      error.code === errors.noExist.code
+        ? errors.noExist
+        : "An error occurred during compression.",
+    );
   }
 };
 
