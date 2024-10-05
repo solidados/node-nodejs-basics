@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { createReadStream } from "node:fs";
 import { createHash } from "node:crypto";
+import process from "node:process";
 
 import { getDirName } from "../helpers/getDirName.js";
 import handleError from "../helpers/handleError.js";
@@ -8,6 +9,9 @@ import handleError from "../helpers/handleError.js";
 const calculateHash = async () => {
   const __dirname = getDirName(import.meta.url);
   const pathToFile = join(__dirname, "files", "fileToCalculateHashFor.txt");
+  const errors = {
+    noExist: { code: "ENOENT", message: "FS operation failed" },
+  };
 
   return new Promise((resolve, reject) => {
     const hash = createHash("sha256");
@@ -23,10 +27,7 @@ const calculateHash = async () => {
 
     stream.on("error", (error) => {
       try {
-        handleError(error, {
-          code: "ENOENT",
-          message: "FS operation failed",
-        });
+        handleError(error, errors.noExist);
       } catch (error) {
         reject(error);
       }
