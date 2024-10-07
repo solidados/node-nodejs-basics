@@ -7,9 +7,6 @@ import handleError from "../helpers/handleError.js";
 const spawnChildProcess = async (args) => {
   const __dirname = getDirName(import.meta.url);
   const pathToScript = join(__dirname, "files", "script.js");
-  const errors = {
-    processError: {},
-  };
 
   const childProcess = spawn("node", [pathToScript, ...args], {
     stdio: ["pipe", "pipe", "inherit", "ipc"],
