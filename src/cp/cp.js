@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import { join } from "node:path";
 import process from "node:process";
 import { getDirName } from "../helpers/getDirName.js";
+import handleError from "../helpers/handleError.js";
 
 const spawnChildProcess = async (args) => {
   const __dirname = getDirName(import.meta.url);
@@ -15,6 +16,9 @@ const spawnChildProcess = async (args) => {
   });
 
   childProcess.send({ greeting: "Hello! Send me some nice words bellow: " });
+  childProcess.on("error", (error) => {
+    handleError(error, "Error in child process:");
+  });
 
   process.stdin.pipe(childProcess.stdin);
   childProcess.stdout.pipe(process.stdout);
